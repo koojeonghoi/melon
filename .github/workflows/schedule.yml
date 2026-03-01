@@ -1,0 +1,32 @@
+name: Melon Chart Crawler
+
+on:
+  schedule:
+    # 깃허브 액션은 UTC 기준입니다. 
+    # 한국 시간(KST) 오후 3시 = UTC 오전 6시
+    - cron: '0 6 * * *'
+  workflow_dispatch: # 수동으로 실행해볼 수 있는 버튼 생성
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run crawler script
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python melon_crawler.py
