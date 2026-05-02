@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import os
 from datetime import datetime, timedelta
 
-# 깃허브 시크릿(Secrets)에서 환경 변수 가져오기 
+# 깃허브 시크릿(Secrets)에서 환경 변수 가져오기
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
