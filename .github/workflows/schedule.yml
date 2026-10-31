@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4 # Node.js 20 버전 경고 해결을 위해 v4로 업데이트
+      uses: actions/checkout@v5 # Node.js 24 이상 지원 최신 버전
 
     - name: Set up Python
-      uses: actions/setup-python@v5 # Node.js 20 버전 경고 해결을 위해 v5로 업데이트
+      uses: actions/setup-python@v6 # Node.js 24 이상 지원 최신 버전
       with:
         python-version: '3.10'
 
