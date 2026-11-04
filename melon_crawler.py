@@ -38,6 +38,18 @@ def get_random_user_agent():
     ]
     return random.choice(user_agents)
 
+def is_new_entry(song):
+    """신규 진입 여부 판별.
+    현재 멜론 구조: <span class="bullet_icons rank_new"><span class="none">순위 진입</span></span>
+    (예전 구조: .rank_wrap 의 title='새로 진입' 도 함께 지원)
+    """
+    if song.select_one('.rank_new'):
+        return True
+    rank_wrap = song.select_one('.rank_wrap')
+    if rank_wrap and '진입' in rank_wrap.get('title', ''):
+        return True
+    return False
+
 def crawl_melon_new_entries():
     url = "https://www.melon.com/chart/day/index.htm"
     headers = {
@@ -60,21 +72,23 @@ def crawl_melon_new_entries():
 
     for song in songs:
         try:
-            rank_wrap = song.select_one('.rank_wrap')
-            if rank_wrap and '새로 진입' in rank_wrap.get('title', ''):
-                rank_elem = song.select_one('span.rank')
-                title_elem = song.select_one('div.ellipsis.rank01 a')
-                artist_elem = song.select_one('div.ellipsis.rank02 span a')
+            if not is_new_entry(song):
+                continue
 
-                if rank_elem and title_elem and artist_elem:
-                    rank = rank_elem.text.strip()
-                    title = title_elem.text.strip()
-                    artist = artist_elem.text.strip()
-                    new_entries.append(f"* {rank}위 (NEW) : {title} - {artist}")
+            rank_elem = song.select_one('span.rank')
+            title_elem = song.select_one('div.ellipsis.rank01 a')
+            artist_elem = song.select_one('div.ellipsis.rank02 a')
+
+            rank = rank_elem.text.strip() if rank_elem else "?"
+            title = title_elem.text.strip() if title_elem else "(곡명 파싱 실패)"
+            artist = artist_elem.text.strip() if artist_elem else "(가수 파싱 실패)"
+            # 파싱이 일부 실패해도 버리지 않고 표시
+            new_entries.append(f"* {rank}위 (NEW) : {title} - {artist}")
         except Exception as e:
             print(f"곡 정보 파싱 중 에러: {e}")
             continue
 
+    print(f"전체 {len(songs)}곡 중 신규 진입 {len(new_entries)}곡")
     return new_entries
 
 if __name__ == "__main__":
